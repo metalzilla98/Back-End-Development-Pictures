@@ -35,7 +35,8 @@ def count():
 ######################################################################
 @app.route("/picture", methods=["GET"])
 def get_pictures():
-    pass
+    if(request.method == 'GET'): 
+        return jsonify(data)
 
 ######################################################################
 # GET A PICTURE
@@ -44,7 +45,12 @@ def get_pictures():
 
 @app.route("/picture/<int:id>", methods=["GET"])
 def get_picture_by_id(id):
-    pass
+
+    for picture in data:
+        if picture["id"] == id:          
+            return jsonify(picture)
+    return jsonify({"message":"Resource not found"}), 404
+
 
 
 ######################################################################
@@ -52,7 +58,13 @@ def get_picture_by_id(id):
 ######################################################################
 @app.route("/picture", methods=["POST"])
 def create_picture():
-    pass
+    picture_post = request.get_json()   
+    for picture in data:
+        if picture["id"] == picture_post["id"]:
+            message_content = f"picture with id {picture_post['id']} already present"
+            return jsonify({"Message":message_content }), 302     
+    data.append(picture_post)
+    return jsonify(picture_post), 201
 
 ######################################################################
 # UPDATE A PICTURE
@@ -61,11 +73,20 @@ def create_picture():
 
 @app.route("/picture/<int:id>", methods=["PUT"])
 def update_picture(id):
-    pass
+    picture_for_update = request.get_json()
+    for i in range(len(data)):
+        if data[i]["id"] == id:
+            data[i] = picture_for_update
+            return jsonify(picture_for_update),200
+    return jsonify({"message": "picture not found"}),404  
 
 ######################################################################
 # DELETE A PICTURE
 ######################################################################
 @app.route("/picture/<int:id>", methods=["DELETE"])
 def delete_picture(id):
-    pass
+    for i in range(len(data)):
+        if data[i]["id"] == id:
+            del data[i]    
+            return "",204
+    return jsonify({"message": "picture not found"}),404
